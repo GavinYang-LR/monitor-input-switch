@@ -1,12 +1,15 @@
 $ErrorActionPreference = "Stop"
 
-$installDir = Join-Path $env:LOCALAPPDATA "MonitorInputSwitcher"
+$installDir = Join-Path $env:LOCALAPPDATA "DisplaySwitch"
+$legacyInstallDir = Join-Path $env:LOCALAPPDATA "MonitorInputSwitcher"
 $desktop = [Environment]::GetFolderPath(
     [Environment+SpecialFolder]::DesktopDirectory
 )
-$shortcutPath = Join-Path $desktop "Switch to Mac.lnk"
-$startMenuDir = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Monitor Input Switcher"
-$uninstallShortcutPath = Join-Path $startMenuDir "Uninstall Monitor Input Switcher.lnk"
+$shortcutPath = Join-Path $desktop "To Mac.lnk"
+$legacyShortcutPath = Join-Path $desktop "Switch to Mac.lnk"
+$startMenuDir = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Display Switch"
+$legacyStartMenuDir = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Monitor Input Switcher"
+$uninstallShortcutPath = Join-Path $startMenuDir "Uninstall Display Switch.lnk"
 $sourceSwitchScript = Join-Path $PSScriptRoot "Switch-To-Mac.ps1"
 $sourceLauncher = Join-Path $PSScriptRoot "Switch-To-Mac.vbs"
 $sourceIcon = Join-Path $PSScriptRoot "MonitorSwitch.ico"
@@ -37,6 +40,14 @@ if (-not (Test-Path $sourceUninstaller)) {
 $null = New-Item -ItemType Directory -Path $installDir -Force
 $null = New-Item -ItemType Directory -Path $startMenuDir -Force
 
+if (Test-Path $legacyShortcutPath) {
+    Remove-Item -LiteralPath $legacyShortcutPath -Force
+}
+
+if (Test-Path $legacyStartMenuDir) {
+    Remove-Item -LiteralPath $legacyStartMenuDir -Recurse -Force
+}
+
 Copy-Item -LiteralPath $sourceSwitchScript -Destination $switchScript -Force
 Copy-Item -LiteralPath $sourceLauncher -Destination $launcherPath -Force
 Copy-Item -LiteralPath $sourceIcon -Destination $iconPath -Force
@@ -46,9 +57,9 @@ $shell = New-Object -ComObject WScript.Shell
 $shortcut = $shell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = $wscript
 $shortcut.Arguments = "`"$launcherPath`""
-$shortcut.WorkingDirectory = $PSScriptRoot
+$shortcut.WorkingDirectory = $installDir
 $shortcut.IconLocation = "$iconPath,0"
-$shortcut.Description = "Switch AOC CU34G2X to the Mac mini on HDMI2"
+$shortcut.Description = "Switch the display to the Mac"
 $shortcut.Hotkey = "CTRL+ALT+M"
 $shortcut.Save()
 
@@ -57,7 +68,7 @@ $uninstallShortcut.TargetPath = $powerShell
 $uninstallShortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$uninstallerPath`""
 $uninstallShortcut.WorkingDirectory = $installDir
 $uninstallShortcut.IconLocation = "$iconPath,0"
-$uninstallShortcut.Description = "Uninstall Monitor Input Switcher"
+$uninstallShortcut.Description = "Uninstall Display Switch"
 $uninstallShortcut.Save()
 
 if (-not (Test-Path $shortcutPath)) {
@@ -71,5 +82,9 @@ Write-Host ""
 Write-Host "Installed files:"
 Write-Host $installDir
 Write-Host ""
-Write-Host "Double-click 'Switch to Mac' or press Ctrl+Alt+M."
+Write-Host "Double-click 'To Mac' or press Ctrl+Alt+M."
 Write-Host "The downloaded ZIP and extracted folder can now be deleted."
+
+if ((Test-Path $legacyInstallDir) -and ($legacyInstallDir -ne $installDir)) {
+    Remove-Item -LiteralPath $legacyInstallDir -Recurse -Force
+}

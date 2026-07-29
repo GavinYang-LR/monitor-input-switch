@@ -7,7 +7,7 @@ readonly INPUT_SELECT_VCP="0x60"
 readonly WINDOWS_DP2="0x10"
 
 if [[ ! -x "${BETTERDISPLAY_CLI}" ]]; then
-  osascript -e 'display alert "缺少 BetterDisplay" message "请先安装并启动 BetterDisplay。" as critical'
+  osascript -e 'display alert "BetterDisplay is required" message "Install and start BetterDisplay before using this app." as critical'
   exit 1
 fi
 
@@ -23,5 +23,5 @@ if "${BETTERDISPLAY_CLI}" set \
   exit 0
 fi
 
-osascript -e 'display alert "切换失败" message "请确认显示器菜单 Extra → DDC/CI 已设置为 Yes，且 BetterDisplay 正在运行。" as critical'
+osascript -e 'display alert "Switch failed" message "Confirm that Extra > DDC/CI is set to Yes on the monitor and that BetterDisplay is running." as critical'
 exit 1

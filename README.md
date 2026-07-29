@@ -1,76 +1,73 @@
-# AOC CU34G2X 双机输入源一键切换
+# Display Switch
 
-通过 DDC/CI 在共用一台 AOC CU34G2X 显示器的 Mac mini 和 Windows PC
-之间一键切换输入源。
+[English](README.md) | [简体中文](README.zh-CN.md)
 
-![应用图标](assets/monitor-switch-icon.png)
+One-click DDC/CI input switching for an AOC CU34G2X shared by a Mac mini
+and a Windows PC.
 
-当前稳定版：`v1.0.2`。已在 Mac mini（HDMI2）与 Windows PC（DP2）
-连接 AOC CU34G2X 的环境中实机验证。
+![Display Switch icon](assets/monitor-switch-icon.png)
 
-接线配置：
+The tested setup is:
 
-- Mac mini：HDMI2（DDC 值 `0x12`）
-- Windows：DP2（DDC 值 `0x10`）
-- 输入选择：VCP `0x60`
+- Mac mini on HDMI2 (`0x12`)
+- Windows PC on DP2 (`0x10`)
+- Input Select on VCP `0x60`
 
-## 显示器设置
+## Monitor setup
 
-打开 AOC 菜单，将 `Extra → DDC/CI` 设置为 `Yes`。
+Open the AOC monitor menu and set `Extra → DDC/CI` to `Yes`.
 
-## Mac：切换到 Windows
+## macOS: switch to Windows
 
-1. 安装并启动
-   [BetterDisplay](https://github.com/waydabber/BetterDisplay)；本项目使用的
-   DDC 输入切换属于其免费功能。
-2. 将 `mac/Switch-to-Windows.command` 设为可执行：
+1. Install and start
+   [BetterDisplay](https://github.com/waydabber/BetterDisplay). DDC input
+   switching is included in its free feature set.
+2. Download `Mac-To-Windows-v1.1.0.zip` from the latest release.
+3. Move `To Windows.app` to Applications or the Desktop.
+4. Open the app to switch the monitor to Windows on DP2.
 
-   ```shell
-   chmod +x mac/Switch-to-Windows.command
-   ```
+The first launch may require right-clicking the app and choosing **Open**.
 
-3. 双击该文件即可切换到 Windows，也可以将它放到桌面或 Dock。
+To build the app from source:
 
-## Windows：切换到 Mac
+```shell
+./mac/build-app.sh 1.1.0
+```
 
-1. 把整个 `windows` 文件夹复制到 Windows。
-2. 双击 `Install-Desktop-Shortcut.cmd`。
-3. 安装器会把运行文件复制到 `%LOCALAPPDATA%\MonitorInputSwitcher`。
-4. Windows 桌面会出现带图标的“Switch to Mac”；双击它，或者按
-   `Ctrl+Alt+M`，显示器就会切换到 Mac 的 HDMI2。
-5. 安装完成后，可以删除下载的 ZIP 和整个解压目录，不会影响使用。
+## Windows: switch to Mac
 
-Windows 脚本直接调用系统 `Dxva2.dll`，不需要安装 ControlMyMonitor。
-日常运行通过 `wscript.exe` 静默启动，不会显示 CMD 或 PowerShell 黑框。
+1. Download and extract `Windows-To-Mac-v1.1.0.zip`.
+2. Run `Install-Desktop-Shortcut.cmd`.
+3. The installer copies runtime files to `%LOCALAPPDATA%\DisplaySwitch`.
+4. Open the desktop shortcut `To Mac`, or press `Ctrl+Alt+M`.
+5. The downloaded ZIP and extracted directory can be deleted after installation.
 
-卸载时，在开始菜单打开 `Monitor Input Switcher`，运行
-`Uninstall Monitor Input Switcher`。
+Daily use is launched silently through `wscript.exe`, so no CMD or PowerShell
+window appears. The native implementation uses Windows `Dxva2.dll` and does
+not require ControlMyMonitor.
 
-如果点击后没有切换，请双击 `Test-Switch-To-Mac.cmd`。测试窗口会保留，
-并将显示器枚举、当前 VCP 值和切换结果写入 `last-run.log`。
+To uninstall, open `Display Switch` in the Start menu and run
+`Uninstall Display Switch`.
 
-## 自定义其他接线
+## Diagnostics
 
-本项目默认使用 MCCS VCP `0x60`：
+Run `Test-Switch-To-Mac.cmd` from the extracted Windows package. It keeps the
+console open and writes monitor enumeration, the current VCP value, and the
+switch result to `last-run.log`.
 
-| 输入源 | 值 |
+## Input values
+
+| Input | Value |
 |---|---:|
 | DP1 | `0x0F` |
 | DP2 | `0x10` |
 | HDMI1 | `0x11` |
 | HDMI2 | `0x12` |
 
-修改 Mac 脚本中的 `WINDOWS_DP2`，以及 Windows 脚本中的 `$MacHdmi2`，
-即可适配其他接线。不同型号显示器的输入值可能不同，请以实际 DDC capabilities
-返回结果为准。
+To support another wiring layout, update `WINDOWS_DP2` in the macOS script and
+`$MacHdmi2` in the Windows script. Other monitor models may use different
+values; verify their DDC capabilities before changing inputs.
 
-## 故障排查
-
-- 确认 DDC/CI 为 `Yes`。
-- 避免使用不传递 DDC 信号的转接器或扩展坞。
-- 如果 Windows 脚本枚举到多个显示器，它会依次尝试，成功切换后停止。
-- 某些显示器固件只允许当前输入对应的电脑发送切换命令，这是正常的；本工具正是两端各自切到另一端。
-
-## 许可证
+## License
 
 [MIT](LICENSE)
