@@ -5,6 +5,9 @@
 
 ![应用图标](assets/monitor-switch-icon.png)
 
+当前稳定版：`v1.0.0`。已在 Mac mini（HDMI2）与 Windows PC（DP2）
+连接 AOC CU34G2X 的环境中实机验证。
+
 接线配置：
 
 - Mac mini：HDMI2（DDC 值 `0x12`）
@@ -35,6 +38,9 @@
 3. Windows 桌面会出现带图标的“切换到 Mac”；双击它，或者按 `Ctrl+Alt+M`，显示器就会切换到 Mac 的 HDMI2。
 
 Windows 脚本直接调用系统 `Dxva2.dll`，不需要安装 ControlMyMonitor。
+
+如果点击后没有切换，请双击 `Test-Switch-To-Mac.cmd`。测试窗口会保留，
+并将显示器枚举、当前 VCP 值和切换结果写入 `last-run.log`。
 
 ## 自定义其他接线
 
