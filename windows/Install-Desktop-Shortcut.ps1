@@ -1,20 +1,38 @@
 $ErrorActionPreference = "Stop"
 
+$installDir = Join-Path $env:LOCALAPPDATA "MonitorInputSwitcher"
 $desktop = [Environment]::GetFolderPath(
     [Environment+SpecialFolder]::DesktopDirectory
 )
 $shortcutPath = Join-Path $desktop "Switch to Mac.lnk"
-$switchScript = Join-Path $PSScriptRoot "Switch-To-Mac.ps1"
-$iconPath = Join-Path $PSScriptRoot "MonitorSwitch.ico"
+$startMenuDir = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Monitor Input Switcher"
+$uninstallShortcutPath = Join-Path $startMenuDir "Uninstall Monitor Input Switcher.lnk"
+$sourceSwitchScript = Join-Path $PSScriptRoot "Switch-To-Mac.ps1"
+$sourceIcon = Join-Path $PSScriptRoot "MonitorSwitch.ico"
+$sourceUninstaller = Join-Path $PSScriptRoot "Uninstall.ps1"
+$switchScript = Join-Path $installDir "Switch-To-Mac.ps1"
+$iconPath = Join-Path $installDir "MonitorSwitch.ico"
+$uninstallerPath = Join-Path $installDir "Uninstall.ps1"
 $powerShell = Join-Path $env:SystemRoot "System32\WindowsPowerShell\v1.0\powershell.exe"
 
-if (-not (Test-Path $switchScript)) {
-    throw "Switch script not found: $switchScript"
+if (-not (Test-Path $sourceSwitchScript)) {
+    throw "Switch script not found: $sourceSwitchScript"
 }
 
-if (-not (Test-Path $iconPath)) {
-    throw "Icon not found: $iconPath"
+if (-not (Test-Path $sourceIcon)) {
+    throw "Icon not found: $sourceIcon"
 }
+
+if (-not (Test-Path $sourceUninstaller)) {
+    throw "Uninstaller not found: $sourceUninstaller"
+}
+
+$null = New-Item -ItemType Directory -Path $installDir -Force
+$null = New-Item -ItemType Directory -Path $startMenuDir -Force
+
+Copy-Item -LiteralPath $sourceSwitchScript -Destination $switchScript -Force
+Copy-Item -LiteralPath $sourceIcon -Destination $iconPath -Force
+Copy-Item -LiteralPath $sourceUninstaller -Destination $uninstallerPath -Force
 
 $shell = New-Object -ComObject WScript.Shell
 $shortcut = $shell.CreateShortcut($shortcutPath)
@@ -26,6 +44,14 @@ $shortcut.Description = "Switch AOC CU34G2X to the Mac mini on HDMI2"
 $shortcut.Hotkey = "CTRL+ALT+M"
 $shortcut.Save()
 
+$uninstallShortcut = $shell.CreateShortcut($uninstallShortcutPath)
+$uninstallShortcut.TargetPath = $powerShell
+$uninstallShortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$uninstallerPath`""
+$uninstallShortcut.WorkingDirectory = $installDir
+$uninstallShortcut.IconLocation = "$iconPath,0"
+$uninstallShortcut.Description = "Uninstall Monitor Input Switcher"
+$uninstallShortcut.Save()
+
 if (-not (Test-Path $shortcutPath)) {
     throw "Shortcut was not created: $shortcutPath"
 }
@@ -34,4 +60,8 @@ Write-Host ""
 Write-Host "Shortcut created successfully:" -ForegroundColor Green
 Write-Host $shortcutPath
 Write-Host ""
+Write-Host "Installed files:"
+Write-Host $installDir
+Write-Host ""
 Write-Host "Double-click 'Switch to Mac' or press Ctrl+Alt+M."
+Write-Host "The downloaded ZIP and extracted folder can now be deleted."
