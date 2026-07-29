@@ -5,7 +5,7 @@
 
 ![应用图标](assets/monitor-switch-icon.png)
 
-当前稳定版：`v1.0.1`。已在 Mac mini（HDMI2）与 Windows PC（DP2）
+当前稳定版：`v1.0.2`。已在 Mac mini（HDMI2）与 Windows PC（DP2）
 连接 AOC CU34G2X 的环境中实机验证。
 
 接线配置：
@@ -41,6 +41,7 @@
 5. 安装完成后，可以删除下载的 ZIP 和整个解压目录，不会影响使用。
 
 Windows 脚本直接调用系统 `Dxva2.dll`，不需要安装 ControlMyMonitor。
+日常运行通过 `wscript.exe` 静默启动，不会显示 CMD 或 PowerShell 黑框。
 
 卸载时，在开始菜单打开 `Monitor Input Switcher`，运行
 `Uninstall Monitor Input Switcher`。
