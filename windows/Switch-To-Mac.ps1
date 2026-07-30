@@ -4,9 +4,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# AOC CU34G2X: VCP 0x60 = Input Select, HDMI2 = 0x12.
+# VCP 0x60 = Input Select. The Mac app rewrites this value in exported ZIPs.
 $InputSelectVcp = 0x60
-$MacHdmi2 = 0x12
+$MacInputSource = 0x12
 $logPath = Join-Path $PSScriptRoot "last-run.log"
 
 Add-Type -TypeDefinition @"
@@ -210,7 +210,7 @@ public static class MonitorInputSwitcher {
 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 $report = [MonitorInputSwitcher]::Switch(
     [byte]$InputSelectVcp,
-    [uint32]$MacHdmi2
+    [uint32]$MacInputSource
 )
 
 "$timestamp`r`n$report" | Set-Content -Path $logPath -Encoding UTF8
@@ -224,7 +224,7 @@ if ($VerboseMode) {
 if ($report -notmatch "RESULT: SUCCESS") {
     Add-Type -AssemblyName PresentationFramework
     [System.Windows.MessageBox]::Show(
-        "Unable to switch the monitor to HDMI2.`n`n$report`n`nLog: $logPath",
+        "Unable to switch the monitor to the configured Mac input (0x$($MacInputSource.ToString('X2'))).`n`n$report`n`nLog: $logPath",
         "Monitor switch failed",
         "OK",
         "Error"

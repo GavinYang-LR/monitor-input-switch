@@ -1,0 +1,20 @@
+#!/bin/zsh
+
+set -u
+
+readonly SHARED_DOMAIN="io.github.gavinyang-lr.display-switch.shared"
+readonly RESOURCE_DIR="${0:A:h:h}/Resources"
+readonly DDC_CLI="${RESOURCE_DIR}/m1ddc"
+
+windows_input="$(/usr/bin/defaults read "${SHARED_DOMAIN}" windowsInput 2>/dev/null || true)"
+if [[ "${windows_input}" != <-> ]]; then
+  windows_input="16"
+fi
+
+if "${DDC_CLI}" set input "${windows_input}"; then
+  exit 0
+fi
+
+/usr/bin/osascript -e \
+  'display alert "切换失败" message "请确认显示器已开启 DDC/CI，并且 Type-C 转 DP 线支持 DDC 通信。" as critical'
+exit 1

@@ -2,14 +2,15 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-通过 DDC/CI，在共用一台 AOC CU34G2X 显示器的 Mac mini 和 Windows PC
-之间一键切换输入源。
+通过 DDC/CI，在共用一台显示器的 Mac 和 Windows PC 之间一键切换输入源。
+Mac App 可配置两台电脑各自连接的输入源，并直接生成已经写入配置的 Windows
+安装 ZIP。
 
 ![Display Switch 图标](assets/monitor-switch-icon.png)
 
-实机验证的接线方式：
+当前默认接线方式：
 
-- Mac mini 连接 HDMI2（`0x12`）
+- Mac 通过 Type-C 转 DP 连接 DP1（`0x0F`）
 - Windows PC 连接 DP2（`0x10`）
 - 输入源选择使用 VCP `0x60`
 
@@ -19,11 +20,21 @@
 
 ## macOS：切换到 Windows
 
-1. 安装并启动
-   [BetterDisplay](https://github.com/waydabber/BetterDisplay)，DDC 输入切换属于其免费功能。
-2. 从最新 Release 下载 `Mac-To-Windows-v1.1.0.zip`。
-3. 将 `To Windows.app` 移动到“应用程序”或桌面。
-4. 打开 App，将显示器切换到 Windows 所连接的 DP2。
+1. 从最新 Release 下载 Mac 安装 ZIP。
+2. 将 `Display Switch.app` 和 `To Windows.app` 都移动到“应用程序”。
+3. 打开 `Display Switch.app`，分别选择 Mac 和 Windows 所连接的输入源。
+4. 日常直接打开 `To Windows.app`，它会立即切换，不显示设置窗口。
+
+Mac App 已内置 Apple Silicon Type-C/DisplayPort DDC 支持，不需要安装
+BetterDisplay。
+
+## 生成 Windows 安装包
+
+1. 在 Mac App 中确认 Mac 和 Windows 的输入源设置正确。
+2. 点击“导出 Windows 安装 ZIP…”并选择保存位置。
+3. App 会生成 `Windows-To-Mac-输入源.zip`，Mac 的输入源值已经写入安装包。
+4. 将 ZIP 复制到 Windows、解压，并运行 `Install-Desktop-Shortcut.cmd`。
+5. 之后打开桌面的 `To Mac`，或按 `Ctrl+Alt+M`。
 
 首次运行如果被 macOS 阻止，请右键 App 并选择“打开”。
 
@@ -34,6 +45,8 @@
 ```
 
 ## Windows：切换到 Mac
+
+也可以使用预先构建的默认配置包：
 
 1. 下载并解压 `Windows-To-Mac-v1.1.0.zip`。
 2. 运行 `Install-Desktop-Shortcut.cmd`。
@@ -60,8 +73,8 @@
 | HDMI1 | `0x11` |
 | HDMI2 | `0x12` |
 
-如果接线不同，请修改 macOS 脚本中的 `WINDOWS_DP2` 和 Windows 脚本中的
-`$MacHdmi2`。其他型号显示器可能使用不同的输入值，修改前请检查实际 DDC capabilities。
+上述四种输入源可以直接在 Mac App 中选择。其他型号显示器可能使用不同的输入值；
+当前界面仅支持表中这些标准值，请先检查显示器的 DDC capabilities。
 
 ## 许可证
 
